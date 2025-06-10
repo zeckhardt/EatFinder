@@ -5,7 +5,7 @@ import { LatLngBounds, type LatLngExpression } from "leaflet";
 import SearchBar from "./SearchBar";
 import type {OsmElement} from "../types.ts";
 import MapPopup from "./MapPopup.tsx";
-import '../Map.css'
+import '../styles/Map.css'
 
 interface MapListenerProps {
     onBoundsChange: (bounds: LatLngBounds) => void;

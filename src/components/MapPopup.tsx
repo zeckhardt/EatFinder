@@ -2,7 +2,7 @@ import React from "react";
 import Chip from "./Chips.tsx";
 import {Popup} from "react-leaflet";
 import type {OsmElement} from '../types.ts';
-import {formatOpeningHours} from "../openingHoursFormatter.ts";
+import {formatOpeningHours} from "../utils/openingHoursFormatter.ts";
 
 interface MapPopupProps {
     place: OsmElement;

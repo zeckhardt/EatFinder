@@ -1,4 +1,4 @@
-import './App.css'
+import './styles/App.css'
 import AppNavBar from "./components/NavBar.tsx";
 import Map from "./components/Map.tsx";
 

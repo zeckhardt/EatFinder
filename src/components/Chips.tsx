@@ -1,5 +1,5 @@
 import React from 'react';
-import '../Chips.css';
+import '../styles/Chips.css';
 
 interface ChipProps {
     label: string;

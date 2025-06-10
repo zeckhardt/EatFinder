@@ -39,7 +39,7 @@ const combineConsecutiveDays = (dayHours: DayHours[]): DayHours[] => {
 
 export const formatOpeningHours = (openingHours?: string): DayHours[] => {
     if (!openingHours || openingHours.toLowerCase() === 'unknown') {
-        return [{ day: 'Hours', hours: 'Unknown' }];
+        return [{ day: '', hours: 'Unknown' }];
     }
 
     // Handle special cases
@@ -163,6 +163,6 @@ export const formatOpeningHours = (openingHours?: string): DayHours[] => {
 
     } catch (error) {
         console.warn('Error parsing opening hours:', openingHours, error);
-        return [{ day: 'Hours', hours: openingHours }];
+        return [{ day: '', hours: openingHours }];
     }
 };

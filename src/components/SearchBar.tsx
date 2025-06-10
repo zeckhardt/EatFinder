@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "../SearchBar.css";
+import "../styles/SearchBar.css";
 
 interface SearchBarProps {
     onSearch: (query: string) => void;
