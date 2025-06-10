@@ -1,5 +1,6 @@
 import './App.css'
 import AppNavBar from "./components/NavBar.tsx";
+import Map from "./components/Map.tsx";
 
 function App() {
 
@@ -7,7 +8,7 @@ function App() {
     <div>
         <AppNavBar />
       <div className='main-content'>
-
+        <Map />
       </div>
     </div>
   )
