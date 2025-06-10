@@ -2,12 +2,14 @@ import React from "react";
 import Chip from "./Chips.tsx";
 import {Popup} from "react-leaflet";
 import type {OsmElement} from '../types.ts';
+import {formatOpeningHours} from "../openingHoursFormatter.ts";
 
 interface MapPopupProps {
     place: OsmElement;
 }
 
 const MapPopup: React.FC<MapPopupProps> = ({ place }) => {
+    const formattedHours = formatOpeningHours(place.tags?.opening_hours);
 
     return (
         <div>
@@ -30,7 +32,14 @@ const MapPopup: React.FC<MapPopupProps> = ({ place }) => {
                 <br/>
                 {"Hours: "}
                 <br/>
-                {place.tags?.opening_hours ?? "unknown"}
+                <div className='hours-contianer'>
+                    {formattedHours.map((dayHour, index) => (
+                        <div key={index} className="day-hours">
+                            <span className="day-name">{dayHour.day}:</span>{' '}
+                            <span className="hours-time">{dayHour.hours}</span>
+                        </div>
+                    ))}
+                </div>
                 <br />
                 <a href={place.tags?.website ?? "" } target="_blank" rel="noopener noreferrer">Website</a>
             </Popup>
