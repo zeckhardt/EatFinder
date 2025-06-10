@@ -4,8 +4,7 @@ import React, { useCallback, useState, useRef } from "react";
 import { LatLngBounds, type LatLngExpression } from "leaflet";
 import SearchBar from "./SearchBar";
 import Chip from "./Chips";
-
-
+import '../Map.css'
 
 interface MapListenerProps {
     onBoundsChange: (bounds: LatLngBounds) => void;
@@ -42,7 +41,6 @@ const OverpassMap: React.FC = () => {
     const [, setSearchQuery] = useState<string>('');
     const boundsRef = useRef<LatLngBounds | null>(null);
 
-
     const fetchRestaurants = useCallback(async (bounds: LatLngBounds, query?: string) => {
             setLoading(true);
 
@@ -77,10 +75,9 @@ const OverpassMap: React.FC = () => {
         []
     );
 
-
     return (
-        <div style={{ height: "90vh" }}>
-            <MapContainer center={center} zoom={16} style={{ height: "100%" }}>
+        <div className="overpass-map-container">
+            <MapContainer center={center} zoom={16} className="map-container">
                 <TileLayer
                     attribution='&copy; <a href="https://www.hotosm.org/">Humanitarian OpenStreetMap Team</a>'
                     url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
@@ -107,7 +104,7 @@ const OverpassMap: React.FC = () => {
                     <CircleMarker
                         key={place.id}
                         center={[place.lat, place.lon]}
-                        radius={10} // pixels
+                        radius={10}
                         pathOptions={{
                             color: "#ff6600",
                             fillColor: "#ffa366",
@@ -136,15 +133,11 @@ const OverpassMap: React.FC = () => {
                         </Popup>
                     </CircleMarker>
                 ))}
-
-
             </MapContainer>
 
-            {loading && <div style={{ position: "absolute", top: 10, left: 10 }}>Loading...</div>}
+            {loading && <div className="loading-indicator">Loading...</div>}
         </div>
     );
 };
 
 export default OverpassMap;
-
-
