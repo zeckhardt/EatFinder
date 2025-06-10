@@ -1,9 +1,10 @@
-import { MapContainer, TileLayer, CircleMarker, Popup, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, CircleMarker, useMapEvents } from "react-leaflet";
 import 'leaflet/dist/leaflet.css';
 import React, { useCallback, useState, useRef } from "react";
 import { LatLngBounds, type LatLngExpression } from "leaflet";
 import SearchBar from "./SearchBar";
-import Chip from "./Chips";
+import type {OsmElement} from "../types.ts";
+import MapPopup from "./MapPopup.tsx";
 import '../Map.css'
 
 interface MapListenerProps {
@@ -21,14 +22,6 @@ const MapListener: React.FC<MapListenerProps> = ({onBoundsChange}) => {
     return null;
 };
 
-interface OsmElement {
-    id: number;
-    lat: number;
-    lon: number;
-    tags?: {
-        [key: string]: string;
-    }
-}
 
 interface OverpassResponse {
     elements: OsmElement[];
@@ -111,26 +104,7 @@ const OverpassMap: React.FC = () => {
                             fillOpacity: 0.8,
                         }}
                     >
-                        <Popup>
-                            {place.tags?.name ?? "Unnamed Restaurant"}
-                            <br />
-                            {"Cuisine: "}
-                            <div className="chip-container">
-                                {(() => {
-                                    const rawCuisine = place.tags?.cuisine ?? 'unknown';
-                                    const cuisines = rawCuisine.split(';');
-
-                                    return cuisines.map((cuisine) => (
-                                        <Chip label={cuisine} />
-                                    ));
-                                })()}
-                            </div>
-                            <br/>
-                            {"Hours: "}
-                            {place.tags?.opening_hours ?? "unknown"}
-                            <br />
-                            <a href={place.tags?.website ?? "" } target="_blank" rel="noopener noreferrer">Website</a>
-                        </Popup>
+                        <MapPopup place={place}/>
                     </CircleMarker>
                 ))}
             </MapContainer>
