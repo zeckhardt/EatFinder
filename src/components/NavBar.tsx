@@ -10,16 +10,17 @@ import {
     DropdownMenu,
     DropdownItem,
 } from 'reactstrap';
-import {SignedIn, SignedOut, SignInButton, UserButton} from "@clerk/clerk-react";
+import {SignedIn, SignedOut, SignInButton, UserButton, useAuth} from "@clerk/clerk-react";
 
 const AppNavBar: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const {isSignedIn} = useAuth();
 
     const toggle = () => setIsOpen(!isOpen);
 
     return (
         <Navbar color="dark" dark expand="md" className="px-3">
-            <NavbarBrand href="/">Where the Eats @</NavbarBrand>
+            <NavbarBrand href={isSignedIn ? '/dashboard' : '/'}>Where the Eats @</NavbarBrand>
             <NavbarToggler onClick={toggle} />
             <Collapse isOpen={isOpen} navbar>
                 <Nav className="me-auto" navbar>
@@ -37,7 +38,11 @@ const AppNavBar: React.FC = () => {
                 </Nav>
                 <div className="d-flex">
                     <SignedOut>
-                        <SignInButton />
+                        <SignInButton
+                            mode="redirect"
+                            forceRedirectUrl='/dashboard'
+                            signUpForceRedirectUrl='/dashboard'
+                        />
                     </SignedOut>
                     <SignedIn>
                         <UserButton />
