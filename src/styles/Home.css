@@ -1,0 +1,45 @@
+.main-content {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.table-wrapper {
+    flex: 1;
+    min-width: 100px;
+    max-width: 300px;
+}
+
+.map-wrapper {
+    flex: 2;
+    min-width: 500px;
+    height: 600px;
+}
+
+.list-button-group {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+.button-outline {
+    background-color: transparent;
+    padding: 0.6rem 1rem;
+    border: 2px solid black;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 150px;
+    height: 50px;
+}
+
+.add-button {
+    background-color: green;
+}
+
+.remove-button {
+    background-color: red;
+}

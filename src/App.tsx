@@ -36,7 +36,6 @@ function App() {
                                 path="/signup"
                                 routing="path"
                                 signInUrl="/sign-in"
-                                redirectUrl="/dashboard"
                             />
                         </div>
                     }
@@ -50,7 +49,6 @@ function App() {
                                 path="/sign-in"
                                 routing="path"
                                 signUpUrl="/signup"
-                                redirectUrl="/dashboard"
                             />
                         </div>
                     }
