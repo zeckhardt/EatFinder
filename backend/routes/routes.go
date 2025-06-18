@@ -1,0 +1,31 @@
+package routes
+
+import (
+	"backend/handlers"
+	"backend/utils"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
+
+func SetupRoutes(router *gin.Engine) {
+	router.GET("/", func(c *gin.Context) {
+		c.JSON(http.StatusNotFound, gin.H{"error": "This is an API server use /api/ endpoints."})
+	})
+
+	apiGroup := router.Group("/api")
+	{
+
+		authenticated := apiGroup.Group("")
+		authenticated.Use(utils.APIKeyMiddleware())
+		{
+			authenticated.GET("/protected", func(c *gin.Context) {
+				c.JSON(200, gin.H{"message": "You accessed a protected route within /api using an API Key!"})
+			})
+
+			authenticated.POST("/users", handlers.CreateUser)
+			authenticated.GET("/users/:id", handlers.GetUser)
+			authenticated.DELETE("/users/:id", handlers.DeleteUser)
+		}
+	}
+}
