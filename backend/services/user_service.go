@@ -29,9 +29,9 @@ func CreateUser(cxt context.Context, user *data.User) (string, error) {
 	return firestoreDocID, nil
 }
 
-func GetUserByID(cxt context.Context, id string) (*data.User, error) {
+func GetUserByID(ctx context.Context, id string) (*data.User, error) {
 	query := utils.FirestoreClient.Collection("users").Where("ID", "==", id).Limit(1)
-	docs, err := query.Documents(cxt).GetAll()
+	docs, err := query.Documents(ctx).GetAll()
 	if err != nil {
 		return nil, err
 	}
