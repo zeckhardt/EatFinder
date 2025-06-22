@@ -8,9 +8,9 @@ import (
 	"time"
 )
 
-func CreateUser(cxt context.Context, user *data.User) (string, error) {
+func CreateUser(ctx context.Context, user *data.User) (string, error) {
 	query := utils.FirestoreClient.Collection("users").Where("ID", "==", user.ID).Limit(1)
-	docs, err := query.Documents(cxt).GetAll()
+	docs, err := query.Documents(ctx).GetAll()
 	if err != nil {
 		return "", err
 	}
@@ -21,46 +21,27 @@ func CreateUser(cxt context.Context, user *data.User) (string, error) {
 	user.CreatedOn = time.Now()
 	user.Lists = []data.List{}
 
-	docRef, _, err := utils.FirestoreClient.Collection("users").Add(cxt, user)
+	docRef, _, err := utils.FirestoreClient.Collection("users").Add(ctx, user)
 	if err != nil {
 		return "", err
 	}
-	firestoreDocID := docRef.ID
-	return firestoreDocID, nil
+	return docRef.ID, nil
 }
 
 func GetUserByID(ctx context.Context, id string) (*data.User, error) {
-	query := utils.FirestoreClient.Collection("users").Where("ID", "==", id).Limit(1)
-	docs, err := query.Documents(ctx).GetAll()
+	user, _, err := getUserByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
-	if len(docs) == 0 {
-		return nil, errors.New("user not found")
-	}
-	docSnap := docs[0]
-	var user data.User
-	if err := docSnap.DataTo(&user); err != nil {
-		return nil, err
-	}
-	user.ID = docSnap.Data()["ID"].(string)
-	return &user, nil
+	return user, nil
 }
 
-func DeleteUserByID(cxt context.Context, id string) error {
-	query := utils.FirestoreClient.Collection("users").Where("ID", "==", id).Limit(1)
-	docs, err := query.Documents(cxt).GetAll()
+func DeleteUserByID(ctx context.Context, id string) error {
+	_, docSnap, err := getUserByID(ctx, id)
 	if err != nil {
 		return err
-	}
-	if len(docs) == 0 {
-		return errors.New("user not found")
 	}
 
-	docID := docs[0].Ref.ID
-	_, err = utils.FirestoreClient.Collection("users").Doc(docID).Delete(cxt)
-	if err != nil {
-		return err
-	}
-	return nil
+	_, err = utils.FirestoreClient.Collection("users").Doc(docSnap.Ref.ID).Delete(ctx)
+	return err
 }

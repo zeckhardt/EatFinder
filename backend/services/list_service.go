@@ -2,7 +2,6 @@ package services
 
 import (
 	"backend/data"
-	"backend/utils"
 	"context"
 	"errors"
 
@@ -10,17 +9,8 @@ import (
 )
 
 func CreateList(ctx context.Context, userID string, list data.List) (string, error) {
-	query := utils.FirestoreClient.Collection("users").Where("ID", "==", userID).Limit(1)
-	docs, err := query.Documents(ctx).GetAll()
+	user, docSnap, err := getUserByID(ctx, userID)
 	if err != nil {
-		return "", err
-	}
-	if len(docs) == 0 {
-		return "", errors.New("user not found")
-	}
-	docSnap := docs[0]
-	var user data.User
-	if err := docSnap.DataTo(&user); err != nil {
 		return "", err
 	}
 
@@ -30,8 +20,7 @@ func CreateList(ctx context.Context, userID string, list data.List) (string, err
 
 	user.Lists = append(user.Lists, list)
 
-	_, err = utils.FirestoreClient.Collection("users").Doc(docSnap.Ref.ID).Set(ctx, user)
-	if err != nil {
+	if err := saveUser(ctx, user, docSnap); err != nil {
 		return "", err
 	}
 
@@ -39,41 +28,22 @@ func CreateList(ctx context.Context, userID string, list data.List) (string, err
 }
 
 func GetListByName(ctx context.Context, userID string, listName string) (*data.List, error) {
-	query := utils.FirestoreClient.Collection("users").Where("ID", "==", userID).Limit(1)
-	docs, err := query.Documents(ctx).GetAll()
+	user, _, err := getUserByID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
-	if len(docs) == 0 {
-		return nil, errors.New("user not found")
-	}
-	docSnap := docs[0]
-	var user data.User
-	if err := docSnap.DataTo(&user); err != nil {
-		return nil, err
+
+	_, list := findListByName(user.Lists, listName)
+	if list == nil {
+		return nil, errors.New("list not found")
 	}
 
-	for _, list := range user.Lists {
-		if list.ListName == listName {
-			return &list, nil
-		}
-	}
-
-	return nil, errors.New("list not found")
+	return list, nil
 }
 
 func DeleteListByName(ctx context.Context, userID string, listName string) error {
-	query := utils.FirestoreClient.Collection("users").Where("ID", "==", userID).Limit(1)
-	docs, err := query.Documents(ctx).GetAll()
+	user, docSnap, err := getUserByID(ctx, userID)
 	if err != nil {
-		return err
-	}
-	if len(docs) == 0 {
-		return errors.New("user not found")
-	}
-	docSnap := docs[0]
-	var user data.User
-	if err := docSnap.DataTo(&user); err != nil {
 		return err
 	}
 
@@ -85,38 +55,23 @@ func DeleteListByName(ctx context.Context, userID string, listName string) error
 	}
 
 	user.Lists = postDelete
-	_, err = utils.FirestoreClient.Collection("users").Doc(docSnap.Ref.ID).Set(ctx, user)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return saveUser(ctx, user, docSnap)
 }
 
 func AppendPlace(ctx context.Context, userID string, listName string, place data.Place) (*data.Place, error) {
-	query := utils.FirestoreClient.Collection("users").Where("ID", "==", userID).Limit(1)
-	docs, err := query.Documents(ctx).GetAll()
+	user, docSnap, err := getUserByID(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
-	if len(docs) == 0 {
-		return nil, errors.New("user not found")
-	}
-	docSnap := docs[0]
-	var user data.User
-	if err := docSnap.DataTo(&user); err != nil {
-		return nil, err
+
+	listIndex, _ := findListByName(user.Lists, listName)
+	if listIndex == -1 {
+		return nil, errors.New("list not found")
 	}
 
-	for i := range user.Lists {
-		if user.Lists[i].ListName == listName {
-			user.Lists[i].Places = append(user.Lists[i].Places, place)
-			break
-		}
-	}
+	user.Lists[listIndex].Places = append(user.Lists[listIndex].Places, place)
 
-	_, err = utils.FirestoreClient.Collection("users").Doc(docSnap.Ref.ID).Set(ctx, user)
-	if err != nil {
+	if err := saveUser(ctx, user, docSnap); err != nil {
 		return nil, err
 	}
 
