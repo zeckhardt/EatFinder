@@ -55,3 +55,27 @@ func DeleteList(c *gin.Context) {
 
 	c.Status(http.StatusNoContent)
 }
+
+func AddToList(c *gin.Context) {
+
+	var newPlace data.Place
+	if err := c.ShouldBindJSON(&newPlace); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	place, err := services.AppendPlace(c, c.Param("id"), c.Param("listName"), newPlace)
+	if err != nil {
+		if err.Error() == "user not found" {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "Place added successfully",
+		"place":   place,
+	})
+}

@@ -9,8 +9,8 @@ import (
 	"github.com/google/uuid"
 )
 
-func CreateList(ctx context.Context, id string, list data.List) (string, error) {
-	query := utils.FirestoreClient.Collection("users").Where("ID", "==", id).Limit(1)
+func CreateList(ctx context.Context, userID string, list data.List) (string, error) {
+	query := utils.FirestoreClient.Collection("users").Where("ID", "==", userID).Limit(1)
 	docs, err := query.Documents(ctx).GetAll()
 	if err != nil {
 		return "", err
@@ -91,4 +91,34 @@ func DeleteListByName(ctx context.Context, userID string, listName string) error
 	}
 
 	return nil
+}
+
+func AppendPlace(ctx context.Context, userID string, listName string, place data.Place) (*data.Place, error) {
+	query := utils.FirestoreClient.Collection("users").Where("ID", "==", userID).Limit(1)
+	docs, err := query.Documents(ctx).GetAll()
+	if err != nil {
+		return nil, err
+	}
+	if len(docs) == 0 {
+		return nil, errors.New("user not found")
+	}
+	docSnap := docs[0]
+	var user data.User
+	if err := docSnap.DataTo(&user); err != nil {
+		return nil, err
+	}
+
+	for i := range user.Lists {
+		if user.Lists[i].ListName == listName {
+			user.Lists[i].Places = append(user.Lists[i].Places, place)
+			break
+		}
+	}
+
+	_, err = utils.FirestoreClient.Collection("users").Doc(docSnap.Ref.ID).Set(ctx, user)
+	if err != nil {
+		return nil, err
+	}
+
+	return &place, nil
 }
