@@ -77,3 +77,30 @@ func AppendPlace(ctx context.Context, userID string, listName string, place data
 
 	return &place, nil
 }
+
+func RemovePlace(ctx context.Context, userID string, listName string, osmID string) error {
+	user, docSnap, err := getUserByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	listIndex, _ := findListByName(user.Lists, listName)
+	if listIndex == -1 {
+		return errors.New("list not found")
+	}
+
+	places := user.Lists[listIndex].Places
+	newPlaces := make([]data.Place, 0, len(places))
+	for _, place := range places {
+		if place.OsmID != osmID {
+			newPlaces = append(newPlaces, place)
+		}
+	}
+	user.Lists[listIndex].Places = newPlaces
+
+	if err := saveUser(ctx, user, docSnap); err != nil {
+		return err
+	}
+
+	return saveUser(ctx, user, docSnap)
+}

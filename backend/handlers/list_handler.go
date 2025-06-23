@@ -64,7 +64,7 @@ func AddToList(c *gin.Context) {
 		return
 	}
 
-	place, err := services.AppendPlace(c, c.Param("id"), c.Param("listName"), newPlace)
+	place, err := services.AppendPlace(c.Request.Context(), c.Param("id"), c.Param("listName"), newPlace)
 	if err != nil {
 		if err.Error() == "user not found" {
 			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
@@ -78,4 +78,14 @@ func AddToList(c *gin.Context) {
 		"message": "Place added successfully",
 		"place":   place,
 	})
+}
+
+func RemoveFromList(c *gin.Context) {
+	err := services.RemovePlace(c.Request.Context(), c.Param("id"), c.Param("listName"), c.Query("osmID"))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error deleting place: " + err.Error()})
+		return
+	}
+
+	c.Status(http.StatusNoContent)
 }
