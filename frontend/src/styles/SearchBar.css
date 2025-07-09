@@ -22,5 +22,16 @@
 }
 
 .search-button {
-    margin-left: 6px;
+    background-color: #0077cc;
+    color: white;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.search-button:hover {
+    background-color: #005fa3;
 }

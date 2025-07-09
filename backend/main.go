@@ -1,8 +1,10 @@
 package main
 
 import (
+	"github.com/gin-contrib/cors"
 	"log"
 	"os"
+	"time"
 
 	"backend/routes"
 	"backend/utils"
@@ -22,6 +24,15 @@ func main() {
 
 	// Initialize Gin router
 	router := gin.Default()
+
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:5173"}, // Frontend dev URL
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "x-api-key"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 
 	// Setup all routes
 	routes.SetupRoutes(router)

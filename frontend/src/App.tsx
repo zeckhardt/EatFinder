@@ -3,7 +3,20 @@ import {BrowserRouter} from 'react-router-dom';
 import {Routes, Route} from "react-router-dom";
 import Landing from "./views/Landing.tsx";
 import Home from "./views/Home.tsx";
-import {RedirectToSignIn, SignedIn, SignedOut, SignIn, SignUp} from "@clerk/clerk-react";
+import {RedirectToSignIn, SignedIn, SignedOut, SignIn, SignUp, useUser} from "@clerk/clerk-react";
+import {UserIdContext} from "./UserIdContext.tsx";
+
+const DashboardWrapper = () => {
+    const {user, isLoaded } = useUser();
+
+    if (!isLoaded) return null;
+
+    return (
+        <UserIdContext.Provider value={user?.id ?? null}>
+            <Home />
+        </UserIdContext.Provider>
+    )
+}
 
 function App() {
 
@@ -19,7 +32,7 @@ function App() {
                     element={
                         <>
                             <SignedIn>
-                                <Home />
+                                <DashboardWrapper />
                             </SignedIn>
                             <SignedOut>
                                 <RedirectToSignIn />
