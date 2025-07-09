@@ -13,6 +13,12 @@ func SetupRoutes(router *gin.Engine) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "This is an API server use /api/ endpoints."})
 	})
 
+	webhookGroup := router.Group("/webhooks")
+	{
+		// Clerk webhook - no auth middleware since Clerk signs the requests
+		webhookGroup.POST("/clerk", handlers.ClerkWebhook)
+	}
+
 	apiGroup := router.Group("/api")
 	{
 
@@ -30,7 +36,7 @@ func SetupRoutes(router *gin.Engine) {
 			authenticated.POST("/users/:id/lists", handlers.CreateList)
 			authenticated.GET("/users/:id/lists", handlers.GetList)
 			authenticated.DELETE("/users/:id/lists", handlers.DeleteList)
-			
+
 			authenticated.POST("/users/:id/lists/:listName", handlers.AddToList)
 			authenticated.DELETE("/users/:id/lists/:listName", handlers.RemoveFromList)
 		}
