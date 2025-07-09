@@ -37,7 +37,7 @@ const MapPopup: React.FC<MapPopupProps> = ({ place }) => {
                 <div className='hours-contianer'>
                     {formattedHours.map((dayHour, index) => (
                         <div key={index} className="day-hours">
-                            <span className="day-name">{dayHour.day}:</span>{' '}
+                            {dayHour.day && <span className="day-name">{dayHour.day}:</span>}
                             <span className="hours-time">{dayHour.hours}</span>
                         </div>
                     ))}
