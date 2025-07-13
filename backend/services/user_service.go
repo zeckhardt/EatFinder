@@ -62,6 +62,20 @@ func CreateRating(ctx context.Context, userID string, rating data.Rating) (strin
 	if err := saveUser(ctx, user, docSnap); err != nil {
 		return "", err
 	}
-	
+
 	return rating.OsmID, nil
+}
+
+func GetRating(ctx context.Context, userID string, osmID string) (*data.Rating, error) {
+	user, _, err := getUserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	_, rating := findRatingById(user.RatedPlaces, osmID)
+	if rating == nil {
+		return nil, errors.New("rating not found")
+	}
+
+	return rating, nil
 }

@@ -41,3 +41,12 @@ func findListByName(lists []data.List, listName string) (int, *data.List) {
 	}
 	return -1, nil
 }
+
+func findRatingById(ratings []data.Rating, osmID string) (int, *data.Rating) {
+	for i, rating := range ratings {
+		if rating.OsmID == osmID {
+			return i, &ratings[i]
+		}
+	}
+	return -1, nil
+}

@@ -4,6 +4,7 @@ import {Popup} from "react-leaflet";
 import type {OsmElement} from '../types.ts';
 import {formatOpeningHours} from "../utils/openingHoursFormatter.ts";
 import AddToListModal from "./AddPlaceModal.tsx";
+import Rating from "./Rating.tsx";
 
 interface MapPopupProps {
     place: OsmElement;
@@ -18,6 +19,7 @@ const MapPopup: React.FC<MapPopupProps> = ({ place }) => {
             <Popup>
                 <div className='name-container'>
                     {place.tags?.name ?? "Unnamed Restaurant"}
+                    <Rating osmId={place.id} />
                 </div>
                 <br />
                 {"Cuisine: "}

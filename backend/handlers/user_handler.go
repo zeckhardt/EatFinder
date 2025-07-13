@@ -155,3 +155,15 @@ func CreateRating(c *gin.Context) {
 		"osmID":   osmID,
 	})
 }
+
+func GetRatings(c *gin.Context) {
+	docId, err := services.GetRating(c.Request.Context(), c.Param("id"), c.Query("osmID"))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error getting list: " + err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"rating": docId,
+	})
+}
