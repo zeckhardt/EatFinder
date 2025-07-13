@@ -79,9 +79,10 @@ func handleUserDeleted(c *gin.Context, userID string) error {
 
 func convertClerkUserToUser(clerkUser data.ClerkUserData) data.User {
 	return data.User{
-		ID:        clerkUser.ID,
-		Lists:     []data.List{},
-		CreatedOn: time.Unix(clerkUser.CreatedAt/1000, 0),
+		ID:          clerkUser.ID,
+		Lists:       []data.List{},
+		RatedPlaces: []data.Rating{},
+		CreatedOn:   time.Unix(clerkUser.CreatedAt/1000, 0),
 	}
 }
 
@@ -128,4 +129,29 @@ func DeleteUser(c *gin.Context) {
 	}
 
 	c.Status(http.StatusNoContent)
+}
+
+func CreateRating(c *gin.Context) {
+	userID := c.Param("id")
+	var newRating data.Rating
+	if err := c.ShouldBindJSON(&newRating); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	osmID, err := services.CreateRating(c.Request.Context(), userID, newRating)
+	if err != nil {
+		if err.Error() == "user not found" {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "Rating created successfully",
+		"rating":  newRating,
+		"osmID":   osmID,
+	})
 }
