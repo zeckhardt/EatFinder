@@ -20,7 +20,7 @@ func CreateUser(ctx context.Context, user *data.User) (string, error) {
 
 	user.CreatedOn = time.Now()
 	user.Lists = []data.List{}
-	user.RatedPlaces = []data.Rating{}
+	user.VisitedPlaces = []data.UserPlace{}
 
 	docRef, _, err := utils.FirestoreClient.Collection("users").Add(ctx, user)
 	if err != nil {
@@ -47,6 +47,40 @@ func DeleteUserByID(ctx context.Context, id string) error {
 	return err
 }
 
+func VisitPlace(ctx context.Context, userID string, place data.UserPlace) (*data.UserPlace, error) {
+	user, docSnap, err := getUserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	if place.OsmID == "" {
+		return nil, errors.New("missing OsmID in place")
+	}
+
+	user.VisitedPlaces = append(user.VisitedPlaces, place)
+
+	if err := saveUser(ctx, user, docSnap); err != nil {
+		return nil, err
+	}
+
+	return &place, nil
+}
+
+func GetVisitedPlace(ctx context.Context, userID string, osmID string) (*data.UserPlace, error) {
+	user, _, err := getUserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	place := findVisitById(user.VisitedPlaces, osmID)
+	if place == nil {
+		return nil, errors.New("place not found")
+	}
+
+	return place, nil
+}
+
+/*
 func CreateRating(ctx context.Context, userID string, rating data.Rating) (string, error) {
 	user, docSnap, err := getUserByID(ctx, userID)
 	if err != nil {
@@ -79,3 +113,4 @@ func GetRating(ctx context.Context, userID string, osmID string) (*data.Rating, 
 
 	return rating, nil
 }
+*/

@@ -52,6 +52,9 @@ const MapPopup: React.FC<MapPopupProps> = ({ place }) => {
                 >
                     ➕
                 </button>
+                <button>
+                    🍴
+                </button>
                 <AddToListModal
                     isOpen={isModalOpen}
                     onClose={() => setIsModalOpen(false)}

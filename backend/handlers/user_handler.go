@@ -79,10 +79,10 @@ func handleUserDeleted(c *gin.Context, userID string) error {
 
 func convertClerkUserToUser(clerkUser data.ClerkUserData) data.User {
 	return data.User{
-		ID:          clerkUser.ID,
-		Lists:       []data.List{},
-		RatedPlaces: []data.Rating{},
-		CreatedOn:   time.Unix(clerkUser.CreatedAt/1000, 0),
+		ID:            clerkUser.ID,
+		Lists:         []data.List{},
+		VisitedPlaces: []data.UserPlace{},
+		CreatedOn:     time.Unix(clerkUser.CreatedAt/1000, 0),
 	}
 }
 
@@ -131,6 +131,43 @@ func DeleteUser(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
+func VisitPlace(c *gin.Context) {
+	userId := c.Param("id")
+	var newLocation data.UserPlace
+	if err := c.ShouldBindJSON(&newLocation); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	place, err := services.VisitPlace(c.Request.Context(), userId, newLocation)
+	if err != nil {
+		if err.Error() == "user not found" {
+			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		}
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"message": "Place successfully added to visited list",
+		"place":   place,
+	})
+}
+
+func GetVisitedPlace(c *gin.Context) {
+	place, err := services.GetVisitedPlace(c.Request.Context(), c.Param("id"), c.Query("osmID"))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error getting list: " + err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"place": place,
+	})
+}
+
+/*
 func CreateRating(c *gin.Context) {
 	userID := c.Param("id")
 	var newRating data.Rating
@@ -167,3 +204,4 @@ func GetRatings(c *gin.Context) {
 		"rating": docId,
 	})
 }
+*/

@@ -42,6 +42,16 @@ func findListByName(lists []data.List, listName string) (int, *data.List) {
 	return -1, nil
 }
 
+func findVisitById(visitedPlaces []data.UserPlace, osmID string) *data.UserPlace {
+	for i, place := range visitedPlaces {
+		if place.OsmID == osmID {
+			return &visitedPlaces[i]
+		}
+	}
+	return nil
+}
+
+/*
 func findRatingById(ratings []data.Rating, osmID string) (int, *data.Rating) {
 	for i, rating := range ratings {
 		if rating.OsmID == osmID {
@@ -50,3 +60,4 @@ func findRatingById(ratings []data.Rating, osmID string) (int, *data.Rating) {
 	}
 	return -1, nil
 }
+*/

@@ -40,8 +40,13 @@ func SetupRoutes(router *gin.Engine) {
 			authenticated.POST("/users/:id/lists/:listName", handlers.AddToList)
 			authenticated.DELETE("/users/:id/lists/:listName", handlers.RemoveFromList)
 
-			authenticated.POST("/users/:id/ratings", handlers.CreateRating)
-			authenticated.GET("/users/:id/ratings", handlers.GetRatings)
+			authenticated.POST("/users/:id/visit", handlers.VisitPlace)
+			authenticated.GET("/users/:id/visit", handlers.GetVisitedPlace)
+
+			/*
+				authenticated.POST("/users/:id/ratings", handlers.CreateRating)
+				authenticated.GET("/users/:id/ratings", handlers.GetRatings)
+			*/
 		}
 	}
 }
