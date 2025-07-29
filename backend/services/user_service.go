@@ -73,9 +73,6 @@ func GetVisitedPlace(ctx context.Context, userID string, osmID string) (*data.Us
 	}
 
 	place := findVisitById(user.VisitedPlaces, osmID)
-	if place == nil {
-		return nil, errors.New("place not found")
-	}
 
 	return place, nil
 }
