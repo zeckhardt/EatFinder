@@ -20,7 +20,7 @@ const AppNavBar: React.FC = () => {
 
     return (
         <Navbar color="dark" dark expand="md" className="px-3">
-            <NavbarBrand href={isSignedIn ? '/dashboard' : '/'}>Where the Eats @</NavbarBrand>
+            <NavbarBrand href={isSignedIn ? '/EatFinder/dashboard' : '/'}>Where the Eats @</NavbarBrand>
             <NavbarToggler onClick={toggle} />
             <Collapse isOpen={isOpen} navbar>
                 <Nav className="me-auto" navbar>
@@ -40,8 +40,8 @@ const AppNavBar: React.FC = () => {
                     <SignedOut>
                         <SignInButton
                             mode="redirect"
-                            forceRedirectUrl='/dashboard'
-                            signUpForceRedirectUrl='/dashboard'
+                            forceRedirectUrl='/EatFinder/dashboard'
+                            signUpForceRedirectUrl='/EatFinder/dashboard'
                         />
                     </SignedOut>
                     <SignedIn>

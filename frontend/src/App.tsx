@@ -48,7 +48,7 @@ function App() {
                             <SignUp
                                 path="/signup"
                                 routing="path"
-                                signInUrl="/sign-in"
+                                signInUrl="/EatFinder/sign-in"
                             />
                         </div>
                     }
@@ -61,7 +61,7 @@ function App() {
                             <SignIn
                                 path="/sign-in"
                                 routing="path"
-                                signUpUrl="/signup"
+                                signUpUrl="/EatFinder/signup"
                             />
                         </div>
                     }
