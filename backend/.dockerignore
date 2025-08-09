@@ -1,0 +1,36 @@
+# flyctl launch added from .gitignore
+# Binaries
+**/*.exe
+**/*.exe~
+**/*.dll
+**/*.so
+**/*.dylib
+
+# Test binary
+**/*.test
+
+# Output of the go coverage tool
+**/*.out
+
+# Go workspace file
+**/go.work
+
+# Dependencies
+**/vendor
+
+# IDE files
+**/.vscode
+**/.idea
+**/*.swp
+**/*.swo
+
+# flyctl launch added from .idea/.gitignore
+# Default ignored files
+.idea/shelf
+.idea/workspace.xml
+# Editor-based HTTP Client requests
+.idea/httpRequests
+# Datasource local storage ignored files
+.idea/dataSources
+.idea/dataSources.local.xml
+fly.toml
