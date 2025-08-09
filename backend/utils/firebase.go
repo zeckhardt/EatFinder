@@ -19,12 +19,14 @@ var (
 
 // InitFirebase Initializes the Firebase application, authentication client, and Firestore client
 func InitFirebase() {
-	serviceAccountKeyPath := os.Getenv("FIREBASE_SERVICE_ACCOUNT_KEY_PATH")
-	if serviceAccountKeyPath == "" {
-		serviceAccountKeyPath = "./serviceAccountKey.json"
+	// Get the service account key JSON from environment variable
+	serviceAccountKey := os.Getenv("FIREBASE_SERVICE_ACCOUNT_KEY")
+	if serviceAccountKey == "" {
+		log.Fatalf("FIREBASE_SERVICE_ACCOUNT_KEY environment variable is not set")
 	}
 
-	opt := option.WithCredentialsFile(serviceAccountKeyPath)
+	// Use the JSON key directly instead of a file path
+	opt := option.WithCredentialsJSON([]byte(serviceAccountKey))
 	var err error
 	FirebaseApp, err = firebase.NewApp(context.Background(), nil, opt)
 	if err != nil {
