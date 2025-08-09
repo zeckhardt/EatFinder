@@ -22,7 +22,6 @@ const MapListener: React.FC<MapListenerProps> = ({onBoundsChange}) => {
     return null;
 };
 
-
 interface OverpassResponse {
     elements: OsmElement[];
 }
@@ -45,10 +44,10 @@ const OverpassMap: React.FC = () => {
             const nameFilter = query ? `["name"~"${query}",i]` : "";
 
             const overpassQuery = `
-			[out:json][timeout:25];
-			node["amenity"~"^(restaurant|cafe|pub|bar|fast_food|biergarten|ice_cream)$"]${nameFilter}(${south},${west},${north},${east});
-			out;
-		`;
+          [out:json][timeout:25];
+          node["amenity"~"^(restaurant|cafe|pub|bar|fast_food|biergarten|ice_cream)$"]${nameFilter}(${south},${west},${north},${east});
+          out;
+       `;
 
             try {
                 const response = await fetch("https://overpass-api.de/api/interpreter", {
@@ -68,12 +67,29 @@ const OverpassMap: React.FC = () => {
         []
     );
 
+    // Use a single, consistent marker color (Apple blue)
+    const uniformMarkerStyle = {
+        color: "#007AFF",
+        fillColor: "rgba(0, 122, 255, 0.18)",
+    } as const;
+
     return (
         <div className="overpass-map-container">
-            <MapContainer center={center} zoom={16} className="map-container">
+            <MapContainer
+                center={center}
+                zoom={16}
+                className="map-container apple-map"
+                zoomControl={true}
+                scrollWheelZoom={true}
+                touchZoom={true}
+                zoomSnap={0.5}
+                wheelDebounceTime={35}
+            >
+                {/* More colorful but simple Carto Voyager basemap */}
                 <TileLayer
-                    attribution='&copy; <a href="https://www.hotosm.org/">Humanitarian OpenStreetMap Team</a>'
-                    url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+                    url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+                    subdomains="abcd"
                 />
 
                 <MapListener
@@ -93,23 +109,32 @@ const OverpassMap: React.FC = () => {
                     }}
                 />
 
-                {restaurants.map((place) => (
-                    <CircleMarker
-                        key={place.id}
-                        center={[place.lat, place.lon]}
-                        radius={10}
-                        pathOptions={{
-                            color: "#ff6600",
-                            fillColor: "#ffa366",
-                            fillOpacity: 0.8,
-                        }}
-                    >
-                        <MapPopup place={place}/>
-                    </CircleMarker>
-                ))}
+                {restaurants.map((place) => {
+                    return (
+                        <CircleMarker
+                            key={place.id}
+                            center={[place.lat, place.lon]}
+                            radius={7}
+                            pathOptions={{
+                                color: uniformMarkerStyle.color,
+                                fillColor: uniformMarkerStyle.fillColor,
+                                fillOpacity: 0.6,
+                                weight: 1.5,
+                                opacity: 0.95,
+                            }}
+                            className="restaurant-marker"
+                        >
+                            <MapPopup place={place}/>
+                        </CircleMarker>
+                    );
+                })}
             </MapContainer>
 
-            {loading && <div className="loading-indicator">Loading...</div>}
+            {loading && (
+                <div className="loading-indicator">
+                    Loading restaurants...
+                </div>
+            )}
         </div>
     );
 };

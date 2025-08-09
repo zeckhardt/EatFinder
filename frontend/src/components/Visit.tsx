@@ -66,7 +66,7 @@ const Visit: React.FC<Props> = ({ osmId }) => {
             {visit ? (
                 <span>📍</span>
             ) : (
-                <button onClick={handleAddVisit}>Mark as Visited</button>
+                <button onClick={handleAddVisit} style={{ color: '#000' }}>Mark as Visited</button>
             )}
         </div>
     );

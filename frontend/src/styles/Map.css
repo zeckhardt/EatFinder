@@ -10,6 +10,71 @@
     width: 100%;
 }
 
+/* Apple-like subtle background and rounded container */
+.apple-map .leaflet-pane, .apple-map .leaflet-container {
+    background: #f6f7f9;
+}
+
+/* Controls: rounded with subtle shadow */
+.leaflet-control-zoom, .leaflet-control-layers, .leaflet-bar {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.06);
+    border: 1px solid rgba(0,0,0,0.08);
+}
+
+/* Ensure both normal and hover states look the same */
+.leaflet-bar a {
+    width: 34px;
+    height: 34px;
+    line-height: 34px;
+    color: #111;
+    background-color: #ffffff !important;
+    transition: none !important;
+}
+
+/* Disable hover change completely */
+.leaflet-bar a:hover,
+.leaflet-bar a:focus,
+.leaflet-bar a:active,
+.leaflet-bar a:focus-visible,
+.leaflet-bar a:focus-within {
+    color: #111 !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    filter: none !important;
+}
+
+/* Extra specificity for zoom controls */
+.apple-map .leaflet-control-zoom a,
+.apple-map .leaflet-control-zoom a:hover,
+.apple-map .leaflet-control-zoom a:focus,
+.apple-map .leaflet-control-zoom a:active,
+.apple-map .leaflet-control-zoom a:focus-visible {
+    color: #111 !important;
+    background-color: #ffffff !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* Popup content styling */
+.leaflet-popup-content {
+    line-height: 1.45;
+    font-size: 14px;
+}
+
+.leaflet-popup-content a {
+    color: #007aff;
+    text-decoration: none;
+}
+
+.leaflet-popup-content a:hover {
+    text-decoration: underline;
+}
+
 /* Loading indicator */
 .loading-indicator {
     position: absolute;
@@ -17,26 +82,12 @@
     left: 10px;
     background-color: rgba(255, 255, 255, 0.9);
     padding: 8px 16px;
-    border-radius: 4px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.06);
     font-size: 14px;
     z-index: 1000;
 }
 
 .name-container {
-    font-weight: bold;
-}
-
-/* Popup content styling */
-.leaflet-popup-content {
-    line-height: 1.4;
-}
-
-.leaflet-popup-content a {
-    color: #0066cc;
-    text-decoration: none;
-}
-
-.leaflet-popup-content a:hover {
-    text-decoration: underline;
+    font-weight: 600;
 }

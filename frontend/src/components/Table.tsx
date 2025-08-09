@@ -15,9 +15,13 @@ const Table: React.FC = () => {
 
     const getLists = async (id: string) => {
         try {
+            const apiKey = import.meta.env.VITE_BACKEND_API_KEY;
+            console.log('API Key exists:', !!apiKey);
+            console.log('Making request to backend...');
+            
             const response = await axios.get(`https://backend-frosty-lake-2293.fly.dev/api/users/${id}`, {
                 headers: {
-                    'x-api-key': import.meta.env.VITE_BACKEND_API_KEY,
+                    'x-api-key': apiKey,
                     'Content-Type': 'application/json',
                 },
             });
@@ -37,7 +41,10 @@ const Table: React.FC = () => {
                     status: error.response?.status,
                     data: error.response?.data,
                     url: error.config?.url,
+                    code: error.code,
+                    cause: error.cause,
                 });
+                console.error("Full error object:", error);
             } else {
                 console.error("Unexpected error:", error);
             }
