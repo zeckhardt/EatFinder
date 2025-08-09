@@ -26,7 +26,7 @@ func main() {
 	router := gin.Default()
 
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:5173"}, // Frontend dev URL
+		AllowOrigins:     []string{"http://localhost:5173", "https://zeckhardt.github.io/"}, // Frontend dev URL
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "x-api-key"},
 		ExposeHeaders:    []string{"Content-Length"},
