@@ -21,7 +21,7 @@ const DashboardWrapper = () => {
 function App() {
 
     return (
-        <BrowserRouter>
+        <BrowserRouter basename='/EatFinder'>
             <Routes>
                 {/* Public Page */}
                 <Route path="/" element={<Landing />} />
