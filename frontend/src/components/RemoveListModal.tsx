@@ -24,7 +24,7 @@ const RemoveListModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     const fetchLists = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`http://localhost:8080/api/users/${userId}`, {
+            const response = await axios.get(`https://backend-frosty-lake-2293.fly.dev/api/users/${userId}`, {
                 headers: {
                     'x-api-key': import.meta.env.VITE_BACKEND_API_KEY,
                 },
@@ -42,7 +42,7 @@ const RemoveListModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
         if (!confirmed) return;
 
         try {
-            await axios.delete(`http://localhost:8080/api/users/${userId}/lists?name=${listName}`, {
+            await axios.delete(`https://backend-frosty-lake-2293.fly.dev/api/users/${userId}/lists?name=${listName}`, {
                 headers: {
                     'x-api-key': import.meta.env.VITE_BACKEND_API_KEY,
                 },

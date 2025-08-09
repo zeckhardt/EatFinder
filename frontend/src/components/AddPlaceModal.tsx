@@ -34,7 +34,7 @@ const AddToListModal: React.FC<Props> = ({ isOpen, onClose, place }) => {
     const fetchLists = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`http://localhost:8080/api/users/${userId}`, {
+            const response = await axios.get(`https://backend-frosty-lake-2293.fly.dev/api/users/${userId}`, {
                 headers: {
                     'x-api-key': import.meta.env.VITE_BACKEND_API_KEY,
                 },
@@ -50,7 +50,7 @@ const AddToListModal: React.FC<Props> = ({ isOpen, onClose, place }) => {
     const handleAdd = async (listName: string) => {
         try {
             await axios.post(
-                `http://localhost:8080/api/users/${userId}/lists/${listName}`,
+                `https://backend-frosty-lake-2293.fly.dev/api/users/${userId}/lists/${listName}`,
                     {
                         osm_id: place.id.toString(),
                         osm_type: place.tags?.cuisine ?? "unknown",

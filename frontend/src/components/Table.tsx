@@ -15,7 +15,7 @@ const Table: React.FC = () => {
 
     const getLists = async (id: string) => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/users/${id}`, {
+            const response = await axios.get(`https://backend-frosty-lake-2293.fly.dev/api/users/${id}`, {
                 headers: {
                     'x-api-key': import.meta.env.VITE_BACKEND_API_KEY,
                     'Content-Type': 'application/json',

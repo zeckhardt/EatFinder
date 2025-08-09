@@ -14,7 +14,7 @@ const Rating: React.FC<Props> = ({ osmId }) => {
         const fetchRating = async () => {
             try {
                 const response = await axios.get(
-                    `http://localhost:8080/api/users/${userId}/ratings?osmID=${osmId}`,
+                    `https://backend-frosty-lake-2293.fly.dev/api/users/${userId}/ratings?osmID=${osmId}`,
                     {
                         headers: {
                             "x-api-key": import.meta.env.VITE_BACKEND_API_KEY,

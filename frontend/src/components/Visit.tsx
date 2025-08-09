@@ -14,7 +14,7 @@ const Visit: React.FC<Props> = ({ osmId }) => {
         const fetchVisitStatus = async () => {
             try {
                 const response = await axios.get(
-                    `http://localhost:8080/api/users/${userId}/visit?osmID=${osmId}`,
+                    `https://backend-frosty-lake-2293.fly.dev/api/users/${userId}/visit?osmID=${osmId}`,
                     {
                         headers: {
                             "x-api-key": import.meta.env.VITE_BACKEND_API_KEY,
@@ -41,7 +41,7 @@ const Visit: React.FC<Props> = ({ osmId }) => {
         try {
             const nowISO = new Date().toISOString();
             const response = await axios.post(
-                `http://localhost:8080/api/users/${userId}/visit`,
+                `https://backend-frosty-lake-2293.fly.dev/api/users/${userId}/visit`,
                 {
                     osmID: osmId.toString(),
                     tags: [],
