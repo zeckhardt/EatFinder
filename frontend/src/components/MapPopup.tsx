@@ -24,7 +24,7 @@ const MapPopup: React.FC<MapPopupProps> = ({ place, onClose }) => {
 
     return (
         <div>
-            <Popup onClose={onClose}>
+            <Popup>
                 <div className='popup-card'>
                     <div className='popup-header'>
                         <div className='popup-title'>
