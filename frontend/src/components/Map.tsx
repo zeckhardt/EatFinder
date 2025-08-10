@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer, CircleMarker, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, CircleMarker, useMapEvents, useMap } from "react-leaflet";
 import 'leaflet/dist/leaflet.css';
 import React, { useCallback, useState, useRef, useEffect } from "react";
 import { LatLngBounds, type LatLngExpression } from "leaflet";
@@ -8,6 +8,7 @@ import MapPopup from "./MapPopup.tsx";
 import '../styles/Map.css'
 import axios from "axios";
 import { useUserId } from "../UserIdContext.tsx";
+import { useMapNavigation } from "../views/Home.tsx";
 
 interface MapListenerProps {
     onBoundsChange: (bounds: LatLngBounds) => void;
@@ -28,14 +29,37 @@ interface OverpassResponse {
     elements: OsmElement[];
 }
 
+// Component to handle map navigation and popup management
+const MapNavigator: React.FC = () => {
+    const map = useMap();
+    const { navigationTarget, clearNavigation } = useMapNavigation();
+
+    useEffect(() => {
+        if (navigationTarget) {
+            // Center the map on the target location
+            map.setView([navigationTarget.lat, navigationTarget.lon], 18);
+            
+            // Clear the navigation target after centering
+            setTimeout(() => {
+                clearNavigation();
+            }, 100);
+        }
+    }, [navigationTarget, map, clearNavigation]);
+
+    return null;
+};
+
 const OverpassMap: React.FC = () => {
     const [restaurants, setRestaurants] = useState<OsmElement[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [visitedPlaces, setVisitedPlaces] = useState<Set<number>>(new Set());
+    const [navigatedPlace, setNavigatedPlace] = useState<OsmElement | null>(null);
     const center: LatLngExpression = [40.735, -73.930];
     const [, setSearchQuery] = useState<string>('');
     const boundsRef = useRef<LatLngBounds | null>(null);
+    const navigatedMarkerRef = useRef<any>(null);
     const userId = useUserId();
+    const { navigationTarget } = useMapNavigation();
 
     const fetchRestaurants = useCallback(async (bounds: LatLngBounds, query?: string) => {
             setLoading(true);
@@ -70,6 +94,79 @@ const OverpassMap: React.FC = () => {
         },
         []
     );
+
+    // Fetch navigated place data when navigation target changes
+    const fetchNavigatedPlace = useCallback(async (osmId: number, lat: number, lon: number) => {
+        try {
+            const overpassQuery = `
+                [out:json][timeout:25];
+                node(${osmId});
+                out;
+            `;
+
+            const response = await fetch("https://overpass-api.de/api/interpreter", {
+                method: "POST",
+                body: overpassQuery,
+                headers: { "Content-Type": "text/plain" },
+            });
+
+            const data = await response.json();
+            if (data.elements && data.elements.length > 0) {
+                const place = data.elements[0] as OsmElement;
+                setNavigatedPlace(place);
+            } else {
+                // If not found in OSM, create a basic place object
+                const fallbackPlace = {
+                    id: osmId,
+                    lat: lat,
+                    lon: lon,
+                    tags: {
+                        name: `Place (${osmId})`,
+                        amenity: 'restaurant'
+                    }
+                };
+                setNavigatedPlace(fallbackPlace);
+            }
+        } catch (error) {
+            console.error(`Error fetching navigated place:`, error);
+            // Create a basic place object as fallback
+            const fallbackPlace = {
+                id: osmId,
+                lat: lat,
+                lon: lon,
+                tags: {
+                    name: `Place (${osmId})`,
+                    amenity: 'restaurant'
+                }
+            };
+            setNavigatedPlace(fallbackPlace);
+        }
+    }, []);
+
+    // Handle navigation target changes
+    useEffect(() => {
+        if (navigationTarget) {
+            fetchNavigatedPlace(navigationTarget.osmId, navigationTarget.lat, navigationTarget.lon);
+        } else {
+            // Clear navigated place when navigation is cleared
+            setNavigatedPlace(null);
+        }
+    }, [navigationTarget, fetchNavigatedPlace]);
+
+    // Open popup when navigated place is set
+    useEffect(() => {
+        if (navigatedPlace && navigatedMarkerRef.current) {
+            // Small delay to ensure the marker is rendered
+            setTimeout(() => {
+                navigatedMarkerRef.current?.openPopup();
+            }, 200);
+        }
+    }, [navigatedPlace]);
+
+    // Handle popup close
+    const handlePopupClose = () => {
+        setNavigatedPlace(null);
+    };
 
     // Fetch visit status for all restaurants
     const fetchVisitStatus = useCallback(async (restaurantIds: number[]) => {
@@ -143,6 +240,7 @@ const OverpassMap: React.FC = () => {
                 zoomSnap={0.5}
                 wheelDebounceTime={35}
             >
+                <MapNavigator />
                 {/* More colorful but simple Carto Voyager basemap */}
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
@@ -188,6 +286,26 @@ const OverpassMap: React.FC = () => {
                         </CircleMarker>
                     );
                 })}
+
+                {/* Special marker for navigated place */}
+                {navigatedPlace && (
+                    <CircleMarker
+                        ref={navigatedMarkerRef}
+                        key={`navigated-${navigatedPlace.id}`}
+                        center={[navigatedPlace.lat, navigatedPlace.lon]}
+                        radius={10}
+                        pathOptions={{
+                            color: "#FF3B30", // Apple red for highlighted location
+                            fillColor: "rgba(255, 59, 48, 0.3)",
+                            fillOpacity: 0.8,
+                            weight: 3,
+                            opacity: 1,
+                        }}
+                        className="navigated-marker"
+                    >
+                        <MapPopup place={navigatedPlace} onClose={handlePopupClose}/>
+                    </CircleMarker>
+                )}
             </MapContainer>
 
             {loading && (

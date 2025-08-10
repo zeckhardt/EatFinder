@@ -7,6 +7,11 @@
   display: none;
 }
 
+/* Hide default close button when custom close button is present */
+.leaflet-popup-close-button {
+  display: none !important;
+}
+
 /* Inner card */
 .popup-card {
   min-width: 260px;
@@ -21,10 +26,35 @@
   justify-content: space-between;
   gap: 8px;
 }
+
+.popup-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .popup-title {
   font-size: 16px;
   font-weight: 600;
   color: #111;
+  flex: 1;
+}
+
+.popup-close-btn {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.popup-close-btn:hover {
+  background-color: #f0f0f0;
+  color: #333;
 }
 
 /* Chips row */

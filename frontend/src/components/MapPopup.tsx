@@ -9,21 +9,39 @@ import "../styles/MapPopup.css";
 
 interface MapPopupProps {
     place: OsmElement;
+    onClose?: () => void;
 }
 
-const MapPopup: React.FC<MapPopupProps> = ({ place }) => {
+const MapPopup: React.FC<MapPopupProps> = ({ place, onClose }) => {
     const formattedHours = formatOpeningHours(place.tags?.opening_hours);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
+    const handleClose = () => {
+        if (onClose) {
+            onClose();
+        }
+    };
+
     return (
         <div>
-            <Popup>
+            <Popup onClose={onClose}>
                 <div className='popup-card'>
                     <div className='popup-header'>
                         <div className='popup-title'>
                             {place.tags?.name ?? "Unnamed Restaurant"}
                         </div>
-                        <Visit osmId={place.id} />
+                        <div className='popup-header-actions'>
+                            <Visit osmId={place.id} />
+                            {onClose && (
+                                <button 
+                                    className="popup-close-btn"
+                                    onClick={handleClose}
+                                    title="Close"
+                                >
+                                    ✕
+                                </button>
+                            )}
+                        </div>
                     </div>
 
                     <div className="popup-chips">

@@ -19,6 +19,176 @@ h2 {
     color: #333;
 }
 
+.table-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.icon-btn.is-active {
+    outline: 2px solid rgba(217, 48, 37, 0.4);
+    box-shadow: 0 0 0 3px rgba(217, 48, 37, 0.12);
+}
+
+.actions-col {
+    width: 80px;
+    text-align: right;
+}
+
+/* Table base styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+th, td {
+    text-align: left;
+    padding: 12px 16px;
+}
+
+thead {
+    background-color: #0077cc;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Expandable list styles */
+.list-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.expand-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    color: #666;
+    padding: 2px 4px;
+    border-radius: 3px;
+    transition: all 0.2s ease;
+    min-width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.expand-btn:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    color: #333;
+}
+
+.expand-btn.expanded {
+    color: #0077cc;
+}
+
+.places-row {
+    background-color: #f8f9fa;
+}
+
+.places-row td {
+    padding: 0;
+    border-top: none;
+}
+
+.places-container {
+    padding: 16px;
+    border-left: 3px solid #0077cc;
+    margin-left: 16px;
+}
+
+.place-item {
+    padding: 12px;
+    margin-bottom: 8px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-left: 3px solid #e9ecef;
+}
+
+.place-item:last-child {
+    margin-bottom: 0;
+}
+
+.place-name {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.place-name-clickable {
+    background: none;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    color: #0077cc;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 4px;
+    text-align: left;
+    font-family: inherit;
+    transition: color 0.2s ease;
+}
+
+.place-name-clickable:hover {
+    color: #005fa3;
+    text-decoration: underline;
+}
+
+.place-cuisine {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.place-location {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.place-location-clickable {
+    background: none;
+    border: none;
+    font-size: 14px;
+    color: #0077cc;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 4px;
+    text-align: left;
+    font-family: inherit;
+    transition: color 0.2s ease;
+}
+
+.place-location-clickable:hover {
+    color: #005fa3;
+    text-decoration: underline;
+}
+
+.place-website {
+    font-size: 14px;
+    color: #0077cc;
+    text-decoration: none;
+}
+
+.place-website:hover {
+    text-decoration: underline;
+}
+
+.no-places {
+    color: #666;
+    font-style: italic;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Icon button styles */
 .icon-btn {
     width: 28px;
     height: 28px;
@@ -48,42 +218,5 @@ h2 {
 }
 .icon-btn--danger:hover {
     background: #ffe5e5;
-}
-
-.actions-col {
-    width: 80px;
-    text-align: right;
-}
-
-/* Table base styling */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-th, td {
-    text-align: left;
-    padding: 12px 16px;
-}
-
-thead {
-    background-color: #0077cc;
-    color: white;
-}
-
-tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-.table-header-actions {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.icon-btn.is-active {
-    outline: 2px solid rgba(217, 48, 37, 0.4);
-    box-shadow: 0 0 0 3px rgba(217, 48, 37, 0.12);
 }
 
