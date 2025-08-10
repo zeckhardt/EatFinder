@@ -30,10 +30,6 @@ type OsmPlace = {
     };
 };
 
-type LocationData = {
-    name: string;
-    location: string;
-};
 
 type List = {
     id: string;
