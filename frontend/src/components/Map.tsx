@@ -1,11 +1,13 @@
 import { MapContainer, TileLayer, CircleMarker, useMapEvents } from "react-leaflet";
 import 'leaflet/dist/leaflet.css';
-import React, { useCallback, useState, useRef } from "react";
+import React, { useCallback, useState, useRef, useEffect } from "react";
 import { LatLngBounds, type LatLngExpression } from "leaflet";
 import SearchBar from "./SearchBar";
 import type {OsmElement} from "../types.ts";
 import MapPopup from "./MapPopup.tsx";
 import '../styles/Map.css'
+import axios from "axios";
+import { useUserId } from "../UserIdContext.tsx";
 
 interface MapListenerProps {
     onBoundsChange: (bounds: LatLngBounds) => void;
@@ -29,9 +31,11 @@ interface OverpassResponse {
 const OverpassMap: React.FC = () => {
     const [restaurants, setRestaurants] = useState<OsmElement[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
+    const [visitedPlaces, setVisitedPlaces] = useState<Set<number>>(new Set());
     const center: LatLngExpression = [40.735, -73.930];
     const [, setSearchQuery] = useState<string>('');
     const boundsRef = useRef<LatLngBounds | null>(null);
+    const userId = useUserId();
 
     const fetchRestaurants = useCallback(async (bounds: LatLngBounds, query?: string) => {
             setLoading(true);
@@ -67,11 +71,65 @@ const OverpassMap: React.FC = () => {
         []
     );
 
-    // Use a single, consistent marker color (Apple blue)
-    const uniformMarkerStyle = {
-        color: "#007AFF",
-        fillColor: "rgba(0, 122, 255, 0.18)",
-    } as const;
+    // Fetch visit status for all restaurants
+    const fetchVisitStatus = useCallback(async (restaurantIds: number[]) => {
+        if (!userId || restaurantIds.length === 0) return;
+        
+        const visitedSet = new Set<number>();
+        
+        try {
+            const apiKey = import.meta.env.VITE_BACKEND_API_KEY;
+            
+            // Fetch visit status for each restaurant
+            const visitPromises = restaurantIds.map(async (osmId) => {
+                try {
+                    const response = await axios.get(
+                        `https://backend-frosty-lake-2293.fly.dev/api/users/${userId}/visit?osmID=${osmId}`,
+                        {
+                            headers: {
+                                "x-api-key": apiKey,
+                            },
+                        }
+                    );
+                    if (response.data.place) {
+                        visitedSet.add(osmId);
+                    }
+                } catch (err) {
+                    // Ignore errors for individual visit status checks
+                }
+            });
+            
+            await Promise.all(visitPromises);
+            setVisitedPlaces(visitedSet);
+        } catch (err) {
+            console.error("Error fetching visit status:", err);
+        }
+    }, [userId]);
+
+    // Fetch visit status when restaurants change
+    useEffect(() => {
+        if (restaurants.length > 0) {
+            const restaurantIds = restaurants.map(place => place.id);
+            fetchVisitStatus(restaurantIds);
+        }
+    }, [restaurants, fetchVisitStatus]);
+
+    // Get marker style based on visit status
+    const getMarkerStyle = (osmId: number) => {
+        const isVisited = visitedPlaces.has(osmId);
+        
+        if (isVisited) {
+            return {
+                color: "#34C759", // Apple green
+                fillColor: "rgba(52, 199, 89, 0.18)",
+            };
+        } else {
+            return {
+                color: "#007AFF", // Apple blue
+                fillColor: "rgba(0, 122, 255, 0.18)",
+            };
+        }
+    };
 
     return (
         <div className="overpass-map-container">
@@ -110,14 +168,16 @@ const OverpassMap: React.FC = () => {
                 />
 
                 {restaurants.map((place) => {
+                    const markerStyle = getMarkerStyle(place.id);
+
                     return (
                         <CircleMarker
                             key={place.id}
                             center={[place.lat, place.lon]}
                             radius={7}
                             pathOptions={{
-                                color: uniformMarkerStyle.color,
-                                fillColor: uniformMarkerStyle.fillColor,
+                                color: markerStyle.color,
+                                fillColor: markerStyle.fillColor,
                                 fillOpacity: 0.6,
                                 weight: 1.5,
                                 opacity: 0.95,

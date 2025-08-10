@@ -7,12 +7,55 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
+.table-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
 h2 {
-    text-align: center;
-    margin-bottom: 1rem;
+    margin: 0;
     color: #333;
 }
 
+.icon-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    border: 1px solid transparent;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0;
+    user-select: none;
+}
+.icon-btn--primary {
+    background: #e6f0ff;
+    color: #0b5cff;
+    border-color: #c7ddff;
+}
+.icon-btn--primary:hover {
+    background: #d9e9ff;
+}
+.icon-btn--danger {
+    background: #fff1f1;
+    color: #d93025;
+    border-color: #ffd7d7;
+}
+.icon-btn--danger:hover {
+    background: #ffe5e5;
+}
+
+.actions-col {
+    width: 80px;
+    text-align: right;
+}
+
+/* Table base styling */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -31,5 +74,16 @@ thead {
 
 tr:nth-child(even) {
     background-color: #f9f9f9;
+}
+
+.table-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.icon-btn.is-active {
+    outline: 2px solid rgba(217, 48, 37, 0.4);
+    box-shadow: 0 0 0 3px rgba(217, 48, 37, 0.12);
 }
 
