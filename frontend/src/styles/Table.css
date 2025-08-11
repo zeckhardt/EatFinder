@@ -104,16 +104,35 @@ tr:nth-child(even) {
 }
 
 .place-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
     padding: 12px;
     margin-bottom: 8px;
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     border-left: 3px solid #e9ecef;
+    transition: border-left-color 0.2s ease;
 }
 
 .place-item:last-child {
     margin-bottom: 0;
+}
+
+.place-item.remove-mode {
+    border-left-color: #d93025;
+}
+
+.place-content {
+    flex: 1;
+}
+
+.place-actions {
+    display: flex;
+    align-items: center;
+    margin-left: 12px;
+    flex-shrink: 0;
 }
 
 .place-name {
@@ -219,4 +238,3 @@ tr:nth-child(even) {
 .icon-btn--danger:hover {
     background: #ffe5e5;
 }
-

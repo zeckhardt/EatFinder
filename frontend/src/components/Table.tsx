@@ -118,7 +118,7 @@ const Table: React.FC = () => {
                     }
                 }
             );
-            
+
             const data = await response.json();
             if (data.address) {
                 const city = data.address.city || data.address.town || data.address.village || data.address.county || 'Unknown location';
@@ -135,20 +135,20 @@ const Table: React.FC = () => {
     const fetchPlaceDataForList = async (places: Place[]) => {
         const promises = places.map(place => {
             const promises = [];
-            
+
             // Fetch place name if not already cached
             if (!placeNames.has(place.osm_id)) {
                 promises.push(fetchPlaceName(place.osm_id));
             }
-            
+
             // Fetch location if not already cached
             if (!placeLocations.has(place.osm_id)) {
                 promises.push(fetchLocationName(place.lat, place.long, place.osm_id));
             }
-            
+
             return Promise.all(promises);
         });
-        
+
         await Promise.all(promises);
     };
 
@@ -203,6 +203,30 @@ const Table: React.FC = () => {
             await getLists(userId);
         } catch (error) {
             console.error('Error deleting list:', error);
+        }
+    };
+
+    const handleRemoveFromList = async (listId: string, placeOsmId: string) => {
+        if (!userId) return;
+        const confirmed = confirm('Are you sure you want to remove this place from the list?');
+        if (!confirmed) return;
+        try {
+            const apiKey = import.meta.env.VITE_BACKEND_API_KEY;
+            const list = lists.find(l => l.id === listId);
+            if (!list) return;
+
+            await axios.delete(
+                `https://backend-frosty-lake-2293.fly.dev/api/users/${userId}/lists/${encodeURIComponent(list.list_name)}?osmID=${encodeURIComponent(placeOsmId)}`,
+                {
+                    headers: {
+                        'x-api-key': apiKey,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+            await getLists(userId);
+        } catch (error) {
+            console.error('Error removing place from list:', error);
         }
     };
 
@@ -270,51 +294,52 @@ const Table: React.FC = () => {
 
             <table>
                 <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Entries</th>
-                        {isRemoveMode && <th className="actions-col" aria-label="Actions"></th>}
-                    </tr>
+                <tr>
+                    <th>Name</th>
+                    <th>Entries</th>
+                    {isRemoveMode && <th className="actions-col" aria-label="Actions"></th>}
+                </tr>
                 </thead>
                 <tbody>
-                    {lists.length > 0 ? (
-                        lists.map((list) => (
-                            <React.Fragment key={list.id}>
-                                <tr className={`list-row ${isExpanded(list.id) ? 'expanded' : ''}`}>
-                                    <td>
-                                        <div className="list-name-cell">
-                                            <button
-                                                className={`expand-btn ${isExpanded(list.id) ? 'expanded' : ''}`}
-                                                onClick={() => toggleExpanded(list.id)}
-                                                aria-label={`${isExpanded(list.id) ? 'Collapse' : 'Expand'} ${list.list_name}`}
-                                            >
-                                                {isExpanded(list.id) ? '▼' : '▶'}
-                                            </button>
-                                            <span>{list.list_name}</span>
-                                        </div>
+                {lists.length > 0 ? (
+                    lists.map((list) => (
+                        <React.Fragment key={list.id}>
+                            <tr className={`list-row ${isExpanded(list.id) ? 'expanded' : ''}`}>
+                                <td>
+                                    <div className="list-name-cell">
+                                        <button
+                                            className={`expand-btn ${isExpanded(list.id) ? 'expanded' : ''}`}
+                                            onClick={() => toggleExpanded(list.id)}
+                                            aria-label={`${isExpanded(list.id) ? 'Collapse' : 'Expand'} ${list.list_name}`}
+                                        >
+                                            {isExpanded(list.id) ? '▼' : '▶'}
+                                        </button>
+                                        <span>{list.list_name}</span>
+                                    </div>
+                                </td>
+                                <td>{list.places?.length ?? 0}</td>
+                                {isRemoveMode && (
+                                    <td className="actions-col">
+                                        <button
+                                            className="icon-btn icon-btn--danger"
+                                            aria-label={`Remove ${list.list_name}`}
+                                            title="Remove list"
+                                            onClick={() => handleDelete(list.list_name)}
+                                        >
+                                            −
+                                        </button>
                                     </td>
-                                    <td>{list.places?.length ?? 0}</td>
-                                    {isRemoveMode && (
-                                        <td className="actions-col">
-                                            <button
-                                                className="icon-btn icon-btn--danger"
-                                                aria-label={`Remove ${list.list_name}`}
-                                                title="Remove list"
-                                                onClick={() => handleDelete(list.list_name)}
-                                            >
-                                                −
-                                            </button>
-                                        </td>
-                                    )}
-                                </tr>
-                                {isExpanded(list.id) && (
-                                    <tr className="places-row">
-                                        <td colSpan={isRemoveMode ? 3 : 2}>
-                                            <div className="places-container">
-                                                {list.places && list.places.length > 0 ? (
-                                                    list.places.map((place, index) => (
-                                                        <div key={index} className="place-item">
-                                                            <button 
+                                )}
+                            </tr>
+                            {isExpanded(list.id) && (
+                                <tr className="places-row">
+                                    <td colSpan={isRemoveMode ? 3 : 2}>
+                                        <div className="places-container">
+                                            {list.places && list.places.length > 0 ? (
+                                                list.places.map((place, index) => (
+                                                    <div key={index} className={`place-item ${isRemoveMode ? 'remove-mode' : ''}`}>
+                                                        <div className="place-content">
+                                                            <button
                                                                 className="place-name-clickable"
                                                                 onClick={() => handleLocationClick(place)}
                                                                 title="Click to view on map"
@@ -324,21 +349,34 @@ const Table: React.FC = () => {
                                                             <div className="place-cuisine">Cuisine: {formatChip(place.osm_type)}</div>
                                                             <div className="place-location">Location: {getPlaceLocation(place.osm_id)}</div>
                                                         </div>
-                                                    ))
-                                                ) : (
-                                                    <div className="no-places">No places in this list yet.</div>
-                                                )}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                )}
-                            </React.Fragment>
-                        ))
-                    ) : (
-                        <tr>
-                            <td colSpan={isRemoveMode ? 3 : 2}>No lists found.</td>
-                        </tr>
-                    )}
+                                                        {isRemoveMode && (
+                                                            <div className="place-actions">
+                                                                <button
+                                                                    className="icon-btn icon-btn--danger"
+                                                                    aria-label={`Remove ${getPlaceName(place.osm_id)} from list`}
+                                                                    title="Remove place from list"
+                                                                    onClick={() => handleRemoveFromList(list.id, place.osm_id)}
+                                                                >
+                                                                    −
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div className="no-places">No places in this list yet.</div>
+                                            )}
+                                        </div>
+                                    </td>
+                                </tr>
+                            )}
+                        </React.Fragment>
+                    ))
+                ) : (
+                    <tr>
+                        <td colSpan={isRemoveMode ? 3 : 2}>No lists found.</td>
+                    </tr>
+                )}
                 </tbody>
             </table>
 
