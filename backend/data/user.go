@@ -8,4 +8,5 @@ type User struct {
 	Lists         []List      `json:"lists"`
 	CreatedOn     time.Time   `json:"createdOn"`
 	VisitedPlaces []UserPlace `json:"visitedPlaces"`
+	WatchedPlaces []UserPlace `json:"watchedPlaces"`
 }

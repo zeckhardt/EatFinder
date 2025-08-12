@@ -51,6 +51,15 @@ func findVisitById(visitedPlaces []data.UserPlace, osmID string) *data.UserPlace
 	return nil
 }
 
+func findWatchedById(watchedPlaces []data.UserPlace, osmID string) *data.UserPlace {
+	for i, place := range watchedPlaces {
+		if place.OsmID == osmID {
+			return &watchedPlaces[i]
+		}
+	}
+	return nil
+}
+
 /*
 func findRatingById(ratings []data.Rating, osmID string) (int, *data.Rating) {
 	for i, rating := range ratings {

@@ -77,6 +77,36 @@ func GetVisitedPlace(ctx context.Context, userID string, osmID string) (*data.Us
 	return place, nil
 }
 
+func WatchPlace(ctx context.Context, userID string, place data.UserPlace) (*data.UserPlace, error) {
+	user, docSnap, err := getUserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	if place.OsmID == "" {
+		return nil, errors.New("missing OsmID in place")
+	}
+
+	user.WatchedPlaces = append(user.WatchedPlaces, place)
+
+	if err := saveUser(ctx, user, docSnap); err != nil {
+		return nil, err
+	}
+
+	return &place, nil
+}
+
+func GetWatchedPlace(ctx context.Context, userID string, osmID string) (*data.UserPlace, error) {
+	user, _, err := getUserByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	place := findWatchedById(user.WatchedPlaces, osmID)
+
+	return place, nil
+}
+
 /*
 func CreateRating(ctx context.Context, userID string, rating data.Rating) (string, error) {
 	user, docSnap, err := getUserByID(ctx, userID)

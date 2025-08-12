@@ -43,6 +43,8 @@ func SetupRoutes(router *gin.Engine) {
 			authenticated.POST("/users/:id/visit", handlers.VisitPlace)
 			authenticated.GET("/users/:id/visit", handlers.GetVisitedPlace)
 
+			authenticated.POST("/users/:id/watch", handlers.WatchPlace)
+			authenticated.GET("/users/:id/watch", handlers.GetWatchedPlace)
 			/*
 				authenticated.POST("/users/:id/ratings", handlers.CreateRating)
 				authenticated.GET("/users/:id/ratings", handlers.GetRatings)
