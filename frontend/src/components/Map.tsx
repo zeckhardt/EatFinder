@@ -38,7 +38,7 @@ const MapNavigator: React.FC = () => {
         if (navigationTarget) {
             // Center the map on the target location
             map.setView([navigationTarget.lat, navigationTarget.lon], 18);
-            
+
             // Clear the navigation target after centering
             setTimeout(() => {
                 clearNavigation();
@@ -53,6 +53,7 @@ const OverpassMap: React.FC = () => {
     const [restaurants, setRestaurants] = useState<OsmElement[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [visitedPlaces, setVisitedPlaces] = useState<Set<number>>(new Set());
+    const [watchedPlaces, setWatchedPlaces] = useState<Set<number>>(new Set());
     const [navigatedPlace, setNavigatedPlace] = useState<OsmElement | null>(null);
     const center: LatLngExpression = [40.735, -73.930];
     const [, setSearchQuery] = useState<string>('');
@@ -168,15 +169,26 @@ const OverpassMap: React.FC = () => {
         setNavigatedPlace(null);
     };
 
+    // Function to handle when a place is marked as visited
+    const handlePlaceVisited = useCallback((osmId: number) => {
+        setVisitedPlaces(prev => new Set([...prev, osmId]));
+        // Remove from watched places if it was being watched
+        setWatchedPlaces(prev => {
+            const newWatched = new Set(prev);
+            newWatched.delete(osmId);
+            return newWatched;
+        });
+    }, []);
+
     // Fetch visit status for all restaurants
     const fetchVisitStatus = useCallback(async (restaurantIds: number[]) => {
         if (!userId || restaurantIds.length === 0) return;
-        
+
         const visitedSet = new Set<number>();
-        
+
         try {
             const apiKey = import.meta.env.VITE_BACKEND_API_KEY;
-            
+
             // Fetch visit status for each restaurant
             const visitPromises = restaurantIds.map(async (osmId) => {
                 try {
@@ -195,7 +207,7 @@ const OverpassMap: React.FC = () => {
                     // Ignore errors for individual visit status checks
                 }
             });
-            
+
             await Promise.all(visitPromises);
             setVisitedPlaces(visitedSet);
         } catch (err) {
@@ -203,22 +215,81 @@ const OverpassMap: React.FC = () => {
         }
     }, [userId]);
 
-    // Fetch visit status when restaurants change
+    const fetchWatchStatus = useCallback(async (restaurantIds: number[]) => {
+        if (!userId || restaurantIds.length === 0) return;
+
+        const watchedSet = new Set<number>();
+
+        try {
+            const apiKey = import.meta.env.VITE_BACKEND_API_KEY;
+
+            // Fetch watch status for each restaurant
+            const watchPromises = restaurantIds.map(async (osmId) => {
+                try {
+                    const response = await axios.get(
+                        `https://backend-frosty-lake-2293.fly.dev/api/users/${userId}/watch?osmID=${osmId}`,
+                        {
+                            headers: {
+                                "x-api-key": apiKey,
+                            },
+                        }
+                    );
+                    if (response.data.place) {
+                        watchedSet.add(osmId);
+                    }
+                } catch (err) {
+                    // Ignore errors for individual visit status checks
+                }
+            });
+
+            await Promise.all(watchPromises);
+            setWatchedPlaces(watchedSet);
+        } catch (err) {
+            console.error("Error fetching watch status:", err);
+        }
+    }, [userId]);
+
+    // Clean up watched places when visited places change
+    useEffect(() => {
+        setWatchedPlaces(prev => {
+            const newWatched = new Set(prev);
+            let hasChanged = false;
+
+            // Remove any watched places that are now visited
+            visitedPlaces.forEach(visitedId => {
+                if (newWatched.has(visitedId)) {
+                    newWatched.delete(visitedId);
+                    hasChanged = true;
+                }
+            });
+
+            return hasChanged ? newWatched : prev;
+        });
+    }, [visitedPlaces]);
+
+    // Fetch visit & watch status' when restaurants change
     useEffect(() => {
         if (restaurants.length > 0) {
             const restaurantIds = restaurants.map(place => place.id);
             fetchVisitStatus(restaurantIds);
+            fetchWatchStatus(restaurantIds);
         }
-    }, [restaurants, fetchVisitStatus]);
+    }, [restaurants, fetchVisitStatus, fetchWatchStatus]);
 
     // Get marker style based on visit status
     const getMarkerStyle = (osmId: number) => {
         const isVisited = visitedPlaces.has(osmId);
-        
+        const isWatched = watchedPlaces.has(osmId);
+
         if (isVisited) {
             return {
                 color: "#34C759", // Apple green
                 fillColor: "rgba(52, 199, 89, 0.18)",
+            };
+        } else if (isWatched) {
+            return {
+                color: "#c79434", // Apple orange
+                fillColor: "rgba(199,170,52,0.18)",
             };
         } else {
             return {
@@ -282,7 +353,11 @@ const OverpassMap: React.FC = () => {
                             }}
                             className="restaurant-marker"
                         >
-                            <MapPopup place={place}/>
+                            <MapPopup
+                                place={place}
+                                onVisited={() => handlePlaceVisited(place.id)}
+                                isVisited={visitedPlaces.has(place.id)}
+                            />
                         </CircleMarker>
                     );
                 })}
@@ -295,7 +370,7 @@ const OverpassMap: React.FC = () => {
                         center={[navigatedPlace.lat, navigatedPlace.lon]}
                         radius={10}
                         pathOptions={{
-                            color: "#FF3B30", // Apple red for highlighted location
+                            color: "#FF3B30",
                             fillColor: "rgba(255, 59, 48, 0.3)",
                             fillOpacity: 0.8,
                             weight: 3,
@@ -303,7 +378,12 @@ const OverpassMap: React.FC = () => {
                         }}
                         className="navigated-marker"
                     >
-                        <MapPopup place={navigatedPlace} onClose={handlePopupClose}/>
+                        <MapPopup
+                            place={navigatedPlace}
+                            onClose={handlePopupClose}
+                            onVisited={() => handlePlaceVisited(navigatedPlace.id)}
+                            isVisited={visitedPlaces.has(navigatedPlace.id)}
+                        />
                     </CircleMarker>
                 )}
             </MapContainer>

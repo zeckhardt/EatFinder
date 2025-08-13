@@ -4,25 +4,24 @@ import {useUserId} from "../UserIdContext.tsx";
 
 type Props = {
     osmId: number;
-    onVisited?: () => void;
 };
 
-const Visit: React.FC<Props> = ({ osmId, onVisited }) => {
+const Watch: React.FC<Props> = ({ osmId }) => {
     const userId = useUserId();
-    const [visit, setVisit] = useState<string | null>(null);
+    const [watch, setWatch] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchVisitStatus = async () => {
+        const fetchWatchStatus = async () => {
             try {
                 const response = await axios.get(
-                    `https://backend-frosty-lake-2293.fly.dev/api/users/${userId}/visit?osmID=${osmId}`,
+                    `https://backend-frosty-lake-2293.fly.dev/api/users/${userId}/watch?osmID=${osmId}`,
                     {
                         headers: {
                             "x-api-key": import.meta.env.VITE_BACKEND_API_KEY,
                         },
                     }
                 );
-                setVisit(response.data.place);
+                setWatch(response.data.place);
             } catch (err) {
                 if (axios.isAxiosError(err)) {
                     if (err.response?.status !== 500) {
@@ -34,15 +33,15 @@ const Visit: React.FC<Props> = ({ osmId, onVisited }) => {
             }
         }
         if (userId) {
-            fetchVisitStatus();
+            fetchWatchStatus();
         }
     }, [userId, osmId]);
 
-    const handleAddVisit = async () => {
+    const handleAddWatch = async () => {
         try {
             const nowISO = new Date().toISOString();
             const response = await axios.post(
-                `https://backend-frosty-lake-2293.fly.dev/api/users/${userId}/visit`,
+                `https://backend-frosty-lake-2293.fly.dev/api/users/${userId}/watch`,
                 {
                     osmID: osmId.toString(),
                     tags: [],
@@ -56,25 +55,25 @@ const Visit: React.FC<Props> = ({ osmId, onVisited }) => {
                     },
                 }
             );
-            setVisit(response.data.place.osmID);
-
-            if (onVisited) {
-                onVisited();
-            }
+            setWatch(response.data.place.osmID);
         } catch (err) {
-            console.error("Failed to mark as visited", err);
+            console.error("Failed to mark as watched", err);
         }
     };
 
     return (
         <div>
-            {visit ? (
-                <span>📍</span>
+            {watch ? (
+                <span>
+                    <img src="/src/assets/watched_icon.jpg" alt="Watch" width="20" height="20"/>
+                </span>
             ) : (
-                <button onClick={handleAddVisit} style={{ color: '#000' }}>Visit</button>
+                <button onClick={handleAddWatch} style={{ color: '#000' }}>
+                    <img src="/src/assets/watch_icon.jpg" alt="Watch" width="20" height="20"/>
+                </button>
             )}
         </div>
     );
 }
 
-export default Visit;
+export default Watch;

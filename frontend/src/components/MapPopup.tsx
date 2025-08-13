@@ -6,19 +6,33 @@ import {formatOpeningHours} from "../utils/openingHoursFormatter.ts";
 import AddToListModal from "./AddPlaceModal.tsx";
 import Visit from "./Visit.tsx";
 import "../styles/MapPopup.css";
+import Watch from "./Watch.tsx";
 
 interface MapPopupProps {
     place: OsmElement;
     onClose?: () => void;
+    onVisited?: () => void;
+    isVisited?: boolean;
 }
 
-const MapPopup: React.FC<MapPopupProps> = ({ place, onClose }) => {
+const MapPopup: React.FC<MapPopupProps> = ({
+                                               place,
+                                               onClose,
+                                               onVisited,
+                                               isVisited = false
+                                           }) => {
     const formattedHours = formatOpeningHours(place.tags?.opening_hours);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleClose = () => {
         if (onClose) {
             onClose();
+        }
+    };
+
+    const handleVisited = () => {
+        if (onVisited) {
+            onVisited();
         }
     };
 
@@ -31,9 +45,10 @@ const MapPopup: React.FC<MapPopupProps> = ({ place, onClose }) => {
                             {place.tags?.name ?? "Unnamed Restaurant"}
                         </div>
                         <div className='popup-header-actions'>
-                            <Visit osmId={place.id} />
+                            {!isVisited && <Watch osmId={place.id} />}
+                            <Visit osmId={place.id} onVisited={handleVisited} />
                             {onClose && (
-                                <button 
+                                <button
                                     className="popup-close-btn"
                                     onClick={handleClose}
                                     title="Close"
